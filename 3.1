@@ -1,0 +1,31 @@
+import time
+import RPi.GPIO as GPIO
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(15, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+try:
+    for i in range(50):
+        print(GPIO.input(15))
+        time.sleep(0.2)
+finally:
+    GPIO.cleanup()
+
+while GPIO.input(doorPin) == closedLevel:
+    pass
+start = time.time()
+
+import RPi.GPIO as GPIO
+import time
+
+doorPin = 15
+closedLevel = 1          # дверца закрыта — на входе 1
+
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(doorPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+try:
+    print("Ждём открытия дверцы...")
+    # ждать, пока вход равен closedLevel
+    # запомнить момент открытия и напечатать сообщение
+finally:
+    GPIO.cleanup()
