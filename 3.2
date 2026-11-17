@@ -1,0 +1,34 @@
+# waveMeasure.py
+import time
+from mcp3021_driver import MCP3021
+
+duration = 10            # секунд записи
+filename = "data/wave 60 mm.txt"
+
+
+def save(samples, start, finish, filename):
+    with open(filename, "w") as f:
+        f.write("- Wave Lab\n")
+        f.write(f"# duration {finish - start:.3f} s, samples {len(samples)}\n")
+        for s in samples:
+            f.write(f"{s}\n")
+
+
+adc = MCP3021(5.0)
+
+try:
+    # цикл измерений — сразу, без ожидания дверцы
+    samples = []
+    start = time.time()
+    while time.time() - start < duration:
+        samples.append(adc.get_number())
+    finish = time.time()
+
+    # число отсчётов и частота
+    rate = len(samples) / (finish - start)
+    print(f"Отсчётов: {len(samples)}, частота {rate:.0f} Гц")
+
+    # сохранить
+    save(samples, start, finish, filename)
+finally:
+    adc.deinit()
