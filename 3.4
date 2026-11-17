@@ -1,0 +1,45 @@
+# waveMeasure.py
+
+import time
+import RPi.GPIO as GPIO
+from mcp3021_driver import MCP3021
+
+duration = 15
+waitDoor = True
+filename = "data/wave20mm.txt"
+
+doorPin = 15
+closedLevel = 1
+
+
+def save(samples, start, finish, filename):
+    with open(filename, "w") as f:
+        f.write("- Wave Lab\n")
+        f.write(f"# duration {finish - start:.3f} s, samples {len(samples)}, "
+                f"rate {len(samples)/(finish-start):.0f} Hz\n")
+        for n in samples:
+            f.write(f"{n}\n")
+
+
+adc = MCP3021(5.0)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(doorPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+try:
+    if waitDoor:
+        print("Ждём открытия дверцы...")
+        while GPIO.input(doorPin) == closedLevel:
+            pass
+
+    samples = []
+    start = time.time()
+    while time.time() - start < duration:
+        samples.append(adc.get_number())
+    finish = time.time()
+
+    rate = len(samples) / (finish - start)
+    print(f"Отсчётов: {len(samples)}, частота {rate:.0f} Гц")
+    save(samples, start, finish, filename)
+finally:
+    adc.deinit()
+    GPIO.cleanup()
