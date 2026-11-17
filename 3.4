@@ -3,6 +3,7 @@
 import time
 import RPi.GPIO as GPIO
 from mcp3021_driver import MCP3021
+import matplotlib.pyplot as plt
 
 duration = 15
 waitDoor = True
@@ -40,6 +41,11 @@ try:
     rate = len(samples) / (finish - start)
     print(f"Отсчётов: {len(samples)}, частота {rate:.0f} Гц")
     save(samples, start, finish, filename)
+    plt.plot(samples)
+    plt.xlabel("отсчёт")
+    plt.ylabel("АЦП")
+    plt.title(filename)
+    plt.show()
 finally:
     adc.deinit()
     GPIO.cleanup()
