@@ -1,0 +1,54 @@
+# waveMeasure.py
+import time
+import RPi.GPIO as GPIO
+from mcp3021_driver import MCP3021
+
+duration = 10            # секунд записи (по заданию — 10 с)
+waitDoor = False         # False — для калибровки без ожидания дверцы
+filename = "data/20 mm.txt"   # меняйте на 40/60/80/100 mm.txt
+
+doorPin = 15
+closedLevel = 1          # дверца закрыта — на входе 1
+
+
+def save(samples, start, finish, filename):
+    # функция save() из о3; первая строка — "- Wave Lab"
+    with open(filename, "w") as f:
+        f.write("- Wave Lab\n")
+        f.write(f"# duration {finish - start:.3f} s, samples {len(samples)}\n")
+        for s in samples:
+            f.write(f"{s}\n")
+
+
+# создать объект АЦП, настроить вход дверцы GPIO15, как в п3.1
+adc = MCP3021(5.0)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(doorPin, GPIO.IN, pull_up_down=GPIO.PUD_DOWN)
+
+try:
+    # если waitDoor: ждать открытия дверцы, как в п3.1
+    if waitDoor:
+        print("Ждём открытия дверцы...")
+        while GPIO.input(doorPin) == closedLevel:
+            pass
+
+    # цикл измерений
+    samples = []
+    start = time.time()
+    while time.time() - start < duration:
+        samples.append(adc.get_number())
+    finish = time.time()
+
+    # напечатать число отсчётов и частоту
+    rate = len(samples) / (finish - start)
+    print(f"Отсчётов: {len(samples)}, частота {rate:.0f} Гц")
+
+    # среднее — для проверки монотонности и стабильности
+    avg = sum(samples) / len(samples)
+    print(f"Среднее: {avg:.1f}")
+
+    # сохранить
+    save(samples, start, finish, filename)
+finally:
+    adc.deinit()
+    GPIO.cleanup()
