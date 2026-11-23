@@ -42,10 +42,10 @@ maxAdc = adcMeans.max()
 
 
 list_taus = {
-    20: 1.55,
+    20: 1.56,
     40: 1.55,
     60: 1.15,
-    80: 1.05,
+    80: 1.04,
     100: 1.20
 }
 
@@ -94,7 +94,7 @@ def process_experiment_and_plot(filename, h_nominal):
     plt.xticks(np.arange(0, 4.5, 0.5))
 
     plt.tight_layout()
-    plt.savefig(f"../plots/wave_{h_nominal}mm.png", dpi=150)
+    plt.savefig(f"../plots/wave_{h_nominal}mm.png", dpi=300)
     plt.show()
 
     return tau
@@ -125,7 +125,7 @@ plt.ylabel("скорость волны, м/с")
 plt.legend()
 plt.grid(True, alpha=0.5)
 plt.tight_layout()
-plt.savefig("../plots/theory_curve.png", dpi=150)
+plt.savefig("../plots/theory_curve.png", dpi=300)
 plt.show()
 
 print("\nтаблица")
@@ -158,5 +158,5 @@ plt.title("Проверка теории в логарифмических ко�
 plt.legend()
 plt.grid(True, alpha=0.5)
 plt.tight_layout()
-plt.savefig("../plots/log_log.png", dpi=150)
+plt.savefig("plots/log_log.png", dpi=300)
 plt.show()
